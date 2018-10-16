@@ -1,6 +1,6 @@
 #########################
 ## R Script accompanying "Recursive Binary Partitioning and the Random Forest: An Introduction to Tree-Based Machine Learning Methods in R" 
-## In-text Walkthough
+## In-text Walkthrough
 ## Authors: Andrew N Hall, David M Condon, Daniel K Mroczek
 #########################
 
@@ -42,11 +42,6 @@ pred_dtree <- predict(dtree_pruned, newdata = dat_test) #predict outcome value f
 dtree_RMSE <- sqrt(mean((pred_dtree-dat_test$health)^2, na.rm=T)) #calculate RMSE values from test set predictions
 print(dtree_RMSE) #print RMSE value
 
-### Correlation of prediction with actual
-dat_test_withpreds$predictions_dtree <- pred_dtree
-cor(dat_test_withpreds$predictions_dtree, dat_test_withpreds$health, use = "complete.obs")
-
-
 ####
 # Random Forest
 ###
@@ -61,7 +56,7 @@ dat_complete_test <- dat_complete %>%
 # Random Forest 
 set.seed(44)
 rf <- randomForest(health ~ ., data = dat_complete_train, ntree = 500, importance = TRUE) #function to create a random forest using default values for ntree and mtry
-sqrt(mean(rf$mse))
+sqrt(mean(rf$mse)) #OOB RMSE value
 
 ## Tuning RF 
 set.seed(44)
@@ -76,20 +71,16 @@ rf_final <- randomForest(health ~ ., mtry = 48, ntree = 500, importance = TRUE, 
 varImpPlot(rf_final, type = 1, main = "Variable Importance for Random Forest Regression") #creates importance plot
 
 # Evaluate RF performance
-pred_rf = predict(rf_final, newdata = dat_complete_test)
-rf_RMSE = sqrt(mean((pred_rf-dat_complete_test$health)^2))
+pred_rf = predict(rf_final, newdata = dat_complete_test) #predict outcome value for test set using the random forest
+rf_RMSE = sqrt(mean((pred_rf-dat_complete_test$health)^2)) #calculate RMSE values from test set predictions
 print(rf_RMSE)
 
-dat_complete_test$predictions_rf <- pred_rf
-cor(dat_complete_test$predictions_rf, dat_complete_test$health, use = "complete.obs")
-        
 
 ## Multiple Regression 
-multreg = lm(health ~ ., data = dat_train)
-pred_multreg = predict(multreg, newdata = dat_test, type = "response") 
-multreg_RMSE = sqrt(mean((pred_multreg -dat_test$health)^2, na.rm = T))
+multreg = lm(health ~ ., data = dat_train) #create a multiple regression model predicting health
+pred_multreg = predict(multreg, newdata = dat_test, type = "response") #predcit outcome value for test set using multiple regression
+multreg_RMSE = sqrt(mean((pred_multreg -dat_test$health)^2, na.rm = T)) #calculate RMSE values from test set predictions
 print(multreg_RMSE)
 
-dat_test$predictions_multreg <- pred_multreg
-cor(dat_test$predictions_multreg, dat_test$health, use = "complete.obs")
+
 
